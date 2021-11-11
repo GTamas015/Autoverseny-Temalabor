@@ -5,13 +5,15 @@ public class CarController : MonoBehaviour
     private float horizontal, vertical;
     private bool isBreaking;
     private float currentBreakForce;
+    private bool flipBack;
+    private float time;
+    private float timeLastPressed;
 
     [SerializeField] public float force;
     [SerializeField] public float breakforce;
     [SerializeField] public float maxAngle;
     [SerializeField] public Rigidbody rb;
     [SerializeField] public float velocity;
-    [SerializeField] public Vector3 CenterOfMass;
 
     [SerializeField] public WheelCollider FrontLeftCollider;
     [SerializeField] public WheelCollider FrontRightCollider;
@@ -27,7 +29,11 @@ public class CarController : MonoBehaviour
     void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.centerOfMass = CenterOfMass;
+        Vector3 com;
+        com = rb.transform.position;
+        com.y += 0.4f;
+        com.z += 0.35f;
+        rb.centerOfMass = com;
     }
 
     // Update is called once per frame
@@ -44,6 +50,8 @@ public class CarController : MonoBehaviour
 
         calculateVelocity();
 
+        flipCar();
+
         updateAllWheels();
     }
 
@@ -52,11 +60,16 @@ public class CarController : MonoBehaviour
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         isBreaking = Input.GetKey(KeyCode.Space);
+        flipBack = Input.GetKey(KeyCode.R);
+        if (Input.GetKey(KeyCode.R)) 
+        {
+            flipBack = true;
+            time = Time.time;
+        }
     }
 
     private void handleCar()
     {
-
         FrontLeftCollider.motorTorque = vertical * force;
         FrontRightCollider.motorTorque = vertical * force;
         RearLeftCollider.motorTorque = vertical * force;
@@ -107,5 +120,21 @@ public class CarController : MonoBehaviour
         UpdateWheel(FrontRightCollider, FrontRightTransform);
         UpdateWheel(RearLeftCollider, RearLeftTransform);
         UpdateWheel(RearRightCollider, RearRightTransform);
+    }
+
+    private void flipCar()
+    {
+        float deltaTime = time - timeLastPressed;
+        if (flipBack && deltaTime > 2.0f)
+        {
+            flipBack = false;
+            Vector3 extraHeight = rb.transform.position;
+            extraHeight.y += 2.0f;
+            rb.transform.position = extraHeight;
+
+            rb.transform.Rotate(0.0f, 0.0f, 180.0f);
+
+            timeLastPressed = time;
+        }
     }
 }
