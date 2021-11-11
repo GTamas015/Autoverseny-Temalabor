@@ -7,6 +7,7 @@ using UnityEngine.Events;
 
 public class TimerText : MonoBehaviour
 {
+    
     [Header("Text")]
     [SerializeField] private TextMeshProUGUI TextTimer;
 
@@ -33,10 +34,12 @@ public class TimerText : MonoBehaviour
         TextTimer.text = timePlaying.ToString("mm':'ss'.'ff");
         }
 
-    public void Start()
+    public void StartTimer()
     {
+   
         StartTimer(0);
     }
+
 
     public void StartTimer(float f)
     {
