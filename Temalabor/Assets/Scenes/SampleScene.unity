@@ -2533,7 +2533,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   path: {fileID: 1161425742}
   maxSteerAngle: 45
-  maxMotorTorque: 80
+  maxMotorTorque: 800
   currentSpeed: 0
   maxSpeed: 100
   wheelFL: {fileID: 1037682213}
