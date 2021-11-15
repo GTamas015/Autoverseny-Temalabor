@@ -2,18 +2,19 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
-    private float horizontal, vertical;
+    private float horizontal;
+    private float vertical;
     private bool isBreaking;
-    private float currentBreakForce;
-    private bool flipBack;
-    private float time;
-    private float timeLastPressed;
+    private float currentBrakeForce;
 
-    [SerializeField] public float force;
-    [SerializeField] public float breakforce;
-    [SerializeField] public float maxAngle;
-    [SerializeField] public Rigidbody rb;
+    [SerializeField] public float MotorForce;
+    [SerializeField] public float BrakeForce;
+    [SerializeField] public float maxSteeringAngle;
+
+    [SerializeField] public Rigidbody RB;
+
     [SerializeField] public float velocity;
+    [SerializeField] public float maxSpeed;
 
     [SerializeField] public WheelCollider FrontLeftCollider;
     [SerializeField] public WheelCollider FrontRightCollider;
@@ -28,12 +29,14 @@ public class CarController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        RB = GetComponent<Rigidbody>();
+
         Vector3 com;
-        com = rb.transform.position;
+        com = RB.transform.position;
         com.y += 0.4f;
         com.z += 0.35f;
-        rb.centerOfMass = com;
+
+        RB.centerOfMass = com;
     }
 
     // Update is called once per frame
@@ -44,9 +47,9 @@ public class CarController : MonoBehaviour
 
         handleCar();
 
-        handleBreaking();
+        handleBraking();
 
-        Steering();
+        steering();
 
         calculateVelocity();
 
@@ -60,43 +63,64 @@ public class CarController : MonoBehaviour
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         isBreaking = Input.GetKey(KeyCode.Space);
-        flipBack = Input.GetKey(KeyCode.R);
-        if (Input.GetKey(KeyCode.R)) 
-        {
-            flipBack = true;
-            time = Time.time;
-        }
     }
 
     private void handleCar()
     {
-        FrontLeftCollider.motorTorque = vertical * force;
-        FrontRightCollider.motorTorque = vertical * force;
-        RearLeftCollider.motorTorque = vertical * force;
-        RearRightCollider.motorTorque = vertical * force;
-
-        if (isBreaking)
+        if (RB.velocity.magnitude < maxSpeed)
         {
-            currentBreakForce = breakforce;
+            FrontLeftCollider.motorTorque = vertical * MotorForce;
+            FrontRightCollider.motorTorque = vertical * MotorForce;
+            RearLeftCollider.motorTorque = vertical * MotorForce;
+            RearRightCollider.motorTorque = vertical * MotorForce;
         }
         else
         {
-            currentBreakForce = 0f;
+            FrontLeftCollider.motorTorque = 0;
+            FrontRightCollider.motorTorque = 0;
+            RearLeftCollider.motorTorque = 0;
+            RearRightCollider.motorTorque = 0;
         }
     }
-    private void Steering()
+    private void handleBraking()
     {
-        FrontLeftCollider.steerAngle = maxAngle * horizontal;
-        FrontRightCollider.steerAngle = maxAngle * horizontal;
+        if (isBreaking)
+        {
+            currentBrakeForce = BrakeForce;
+        }
+        else
+        {
+            currentBrakeForce = 0f;
+        }
+
+        RearLeftCollider.brakeTorque = currentBrakeForce;
+        RearRightCollider.brakeTorque = currentBrakeForce;
     }
-    private void handleBreaking()
+    private void steering()
     {
-        //FrontLeftCollider.brakeTorque = currentBreakForce;
-        //FrontRightCollider.brakeTorque = currentBreakForce;
-        RearLeftCollider.brakeTorque = currentBreakForce;
-        RearRightCollider.brakeTorque = currentBreakForce;
+        FrontLeftCollider.steerAngle = maxSteeringAngle * horizontal;
+        FrontRightCollider.steerAngle = maxSteeringAngle * horizontal;
     }
-    private void UpdateWheel(WheelCollider c, Transform t)
+    private void calculateVelocity()
+    {
+        velocity = RB.velocity.magnitude;
+        if (velocity < 0.001)
+        {
+            velocity = 0;
+        }
+    }
+    private void flipCar()
+    {
+        if (RB.transform.rotation.eulerAngles.z >= 45 && velocity == 0)
+        {
+            Vector3 extraHeight = RB.transform.position;
+            extraHeight.y += 0.5f;
+            RB.transform.position = extraHeight;
+
+            RB.transform.Rotate(0, 0, 180);
+        }
+    }
+    private void updateWheel(WheelCollider c, Transform t)
     {
         Vector3 _position;
         Quaternion _rotation;
@@ -104,37 +128,11 @@ public class CarController : MonoBehaviour
         t.position = _position;
         t.rotation = _rotation;
     }
-
-    private void calculateVelocity()
-    {
-        Vector3 velocityVector = rb.velocity;
-        float x_y = Mathf.Sqrt(velocityVector.x * velocityVector.x + velocityVector.y * velocityVector.y);
-        float x_y_z = Mathf.Sqrt(x_y * x_y + velocityVector.z * velocityVector.z);
-        velocity = x_y_z;
-        if (velocity < 0.001)
-            velocity = 0;
-    }
     private void updateAllWheels()
     {
-        UpdateWheel(FrontLeftCollider, FrontLeftTransform);
-        UpdateWheel(FrontRightCollider, FrontRightTransform);
-        UpdateWheel(RearLeftCollider, RearLeftTransform);
-        UpdateWheel(RearRightCollider, RearRightTransform);
-    }
-
-    private void flipCar()
-    {
-        float deltaTime = time - timeLastPressed;
-        if (flipBack && deltaTime > 2.0f)
-        {
-            flipBack = false;
-            Vector3 extraHeight = rb.transform.position;
-            extraHeight.y += 2.0f;
-            rb.transform.position = extraHeight;
-
-            rb.transform.Rotate(0.0f, 0.0f, 180.0f);
-
-            timeLastPressed = time;
-        }
+        updateWheel(FrontLeftCollider, FrontLeftTransform);
+        updateWheel(FrontRightCollider, FrontRightTransform);
+        updateWheel(RearLeftCollider, RearLeftTransform);
+        updateWheel(RearRightCollider, RearRightTransform);
     }
 }
