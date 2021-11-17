@@ -3,12 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using System;
-using UnityEngine.SceneManagement;
 
 public class CountDownTimer : MonoBehaviour
 {
     [SerializeField] CarController car;
-    [SerializeField] Rigidbody enemyCar;
     [SerializeField] Text countdownText;
     [SerializeField] TimerText timer;
     [SerializeField]  int countTime;
