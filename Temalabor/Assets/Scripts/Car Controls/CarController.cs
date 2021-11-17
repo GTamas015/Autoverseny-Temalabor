@@ -16,6 +16,9 @@ public class CarController : MonoBehaviour
     [SerializeField] public float velocity;
     [SerializeField] public float maxSpeed;
 
+    [SerializeField] public int activeEffect;
+    [SerializeField] public float effectDuration;
+
     [SerializeField] public WheelCollider FrontLeftCollider;
     [SerializeField] public WheelCollider FrontRightCollider;
     [SerializeField] public WheelCollider RearLeftCollider;
@@ -33,7 +36,7 @@ public class CarController : MonoBehaviour
 
         Vector3 com;
         com = RB.transform.position;
-        com.y += 0.4f;
+        com.y += 0.2f;
         com.z += 0.35f;
 
         RB.centerOfMass = com;
@@ -111,13 +114,15 @@ public class CarController : MonoBehaviour
     }
     private void flipCar()
     {
-        if (RB.transform.rotation.eulerAngles.z >= 45 && velocity == 0)
+        if (RB.transform.rotation.eulerAngles.z >= 10 && velocity == 0)
         {
             Vector3 extraHeight = RB.transform.position;
             extraHeight.y += 0.5f;
             RB.transform.position = extraHeight;
 
-            RB.transform.Rotate(0, 0, 180);
+            float r = RB.transform.rotation.eulerAngles.z;
+
+            RB.transform.Rotate(0, 0, 360 - r);
         }
     }
     private void updateWheel(WheelCollider c, Transform t)
@@ -134,5 +139,13 @@ public class CarController : MonoBehaviour
         updateWheel(FrontRightCollider, FrontRightTransform);
         updateWheel(RearLeftCollider, RearLeftTransform);
         updateWheel(RearRightCollider, RearRightTransform);
+    }
+    private void effect1()
+    {
+
+    }
+    private void effect2()
+    {
+        
     }
 }
