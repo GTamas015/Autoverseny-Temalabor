@@ -142,10 +142,8 @@ public class CarController : MonoBehaviour
     }
     private void effect1()
     {
-
     }
     private void effect2()
     {
-        
     }
 }
