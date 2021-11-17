@@ -7,13 +7,12 @@ using UnityEngine.UI;
 public class ScoreText : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI scoreText;
-    public Button space;
     public int score = 0;
 
     // Start is called before the first frame update
     void Start()
     {
-        space.onClick.AddListener(TaskOnClick);   
+         
     }
 
     // Update is called once per frame
