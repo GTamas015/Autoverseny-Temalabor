@@ -7,12 +7,13 @@ using UnityEngine.UI;
 public class RankText : MonoBehaviour
 {
     [SerializeField] private TextMeshProUGUI rankText;
+    public Button space;
     public int rank = 1;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        space.onClick.AddListener(TaskOnClick);
     }
 
     // Update is called once per frame
