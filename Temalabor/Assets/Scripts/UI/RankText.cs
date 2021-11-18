@@ -21,9 +21,4 @@ public class RankText : MonoBehaviour
         rankText.text = rank.ToString();
     }
 
-    void TaskOnClick()
-    {
-        //Output this to console when Button1 or Button3 is clicked
-        rank++;
-    }
 }
