@@ -7,6 +7,14 @@ public class CarController : MonoBehaviour
     private bool isBreaking;
     private float currentBrakeForce;
 
+    private bool effectAlreadyActive;
+
+    private float originalMaxSpeed;
+    private WheelFrictionCurve originalfc;
+
+    private bool effect1active;
+    private bool effect2active;
+
     [SerializeField] public float MotorForce;
     [SerializeField] public float BrakeForce;
     [SerializeField] public float maxSteeringAngle;
@@ -40,6 +48,10 @@ public class CarController : MonoBehaviour
         com.z += 0.35f;
 
         RB.centerOfMass = com;
+
+        effectAlreadyActive = false;
+        originalMaxSpeed = maxSpeed;
+        originalfc = FrontLeftCollider.sidewaysFriction;
     }
 
     // Update is called once per frame
@@ -59,6 +71,14 @@ public class CarController : MonoBehaviour
         flipCar();
 
         updateAllWheels();
+
+        if (effect1active) {
+            effect1();
+        }
+
+        if (effect2active) {
+            effect2();
+        }
     }
 
     private void getInput()
@@ -66,6 +86,9 @@ public class CarController : MonoBehaviour
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         isBreaking = Input.GetKey(KeyCode.Space);
+
+        effect1active = Input.GetKey(KeyCode.K);
+        effect2active = Input.GetKey(KeyCode.L);
     }
 
     private void handleCar()
@@ -114,7 +137,8 @@ public class CarController : MonoBehaviour
     }
     private void flipCar()
     {
-        if (RB.transform.rotation.eulerAngles.z >= 10 && velocity == 0)
+        //if (RB.transform.rotation.eulerAngles.z >= 10 && velocity == 0)
+        if (Mathf.Abs(RB.transform.rotation.eulerAngles.z - 360) <= 345 && velocity <= 0.01)
         {
             Vector3 extraHeight = RB.transform.position;
             extraHeight.y += 0.5f;
@@ -142,8 +166,50 @@ public class CarController : MonoBehaviour
     }
     private void effect1()
     {
+        if (!effectAlreadyActive)
+        {
+            effectAlreadyActive = true;
+            activeEffect = 1;
+            maxSpeed += 20;
+            Invoke("reverseEffect1", effectDuration);
+        }
     }
+
+    private void reverseEffect1()
+    {
+        effectAlreadyActive = false;
+        maxSpeed = originalMaxSpeed;
+        activeEffect = 0;
+        effect1active = false;
+    }
+
     private void effect2()
     {
+        if (!effectAlreadyActive)
+        {
+            effectAlreadyActive = true;
+            activeEffect = 2;
+
+            WheelFrictionCurve fc = FrontLeftCollider.sidewaysFriction;
+            fc.stiffness = 0.8f;
+            FrontLeftCollider.sidewaysFriction = fc;
+            FrontRightCollider.sidewaysFriction = fc;
+            RearLeftCollider.sidewaysFriction = fc;
+            RearRightCollider.sidewaysFriction = fc;
+
+            Invoke("reverseEffect2", effectDuration);
+        }
+    }
+    private void reverseEffect2()
+    {
+        effectAlreadyActive = false;
+
+        FrontLeftCollider.sidewaysFriction = originalfc;
+        FrontRightCollider.sidewaysFriction = originalfc;
+        RearLeftCollider.sidewaysFriction = originalfc;
+        RearRightCollider.sidewaysFriction = originalfc;
+
+        activeEffect = 0;
+        effect2active = false;
     }
 }
