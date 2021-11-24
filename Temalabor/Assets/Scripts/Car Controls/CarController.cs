@@ -18,6 +18,7 @@ public class CarController : MonoBehaviour
     [SerializeField] public float MotorForce;
     [SerializeField] public float BrakeForce;
     [SerializeField] public float maxSteeringAngle;
+    [SerializeField] public float DecelerationForce;
 
     [SerializeField] public Rigidbody RB;
 
@@ -66,17 +67,24 @@ public class CarController : MonoBehaviour
 
         steering();
 
+        if (!isBreaking)
+        {
+            decelerate();
+        }
+
         calculateVelocity();
 
         flipCar();
 
         updateAllWheels();
 
-        if (effect1active) {
+        if (effect1active)
+        {
             effect1();
         }
 
-        if (effect2active) {
+        if (effect2active)
+        {
             effect2();
         }
     }
@@ -102,10 +110,10 @@ public class CarController : MonoBehaviour
         }
         else
         {
-            FrontLeftCollider.motorTorque = 0;
-            FrontRightCollider.motorTorque = 0;
-            RearLeftCollider.motorTorque = 0;
-            RearRightCollider.motorTorque = 0;
+            FrontLeftCollider.motorTorque = 0.0f;
+            FrontRightCollider.motorTorque = 0.0f;
+            RearLeftCollider.motorTorque = 0.0f;
+            RearRightCollider.motorTorque = 0.0f;
         }
     }
     private void handleBraking()
@@ -116,7 +124,7 @@ public class CarController : MonoBehaviour
         }
         else
         {
-            currentBrakeForce = 0f;
+            currentBrakeForce = 0.0f;
         }
 
         RearLeftCollider.brakeTorque = currentBrakeForce;
@@ -127,26 +135,46 @@ public class CarController : MonoBehaviour
         FrontLeftCollider.steerAngle = maxSteeringAngle * horizontal;
         FrontRightCollider.steerAngle = maxSteeringAngle * horizontal;
     }
+    private void decelerate()
+    {
+        if (vertical == 0.0f && RB.velocity.magnitude >= 15.0f)
+        {
+            FrontLeftCollider.brakeTorque = DecelerationForce;
+            FrontRightCollider.brakeTorque = DecelerationForce;
+            RearLeftCollider.brakeTorque = DecelerationForce;
+            RearRightCollider.brakeTorque = DecelerationForce;
+        }
+        else
+        {
+            FrontLeftCollider.brakeTorque = 0.0f;
+            FrontRightCollider.brakeTorque = 0.0f;
+            RearLeftCollider.brakeTorque = 0.0f;
+            RearRightCollider.brakeTorque = 0.0f;
+        }
+
+    }
     private void calculateVelocity()
     {
         velocity = RB.velocity.magnitude;
-        if (velocity < 0.001)
+        if (velocity < 0.1f)
         {
-            velocity = 0;
+            velocity = 0.0f;
         }
     }
     private void flipCar()
     {
-        //if (RB.transform.rotation.eulerAngles.z >= 10 && velocity == 0)
-        if (Mathf.Abs(RB.transform.rotation.eulerAngles.z - 360) <= 345 && velocity <= 0.01)
+        float zEulerAngle = RB.transform.rotation.eulerAngles.z;
+        zEulerAngle = Mathf.Abs(zEulerAngle);
+        if (zEulerAngle < 0.1f)
+            zEulerAngle = 0.0f;
+
+        if ((zEulerAngle >= 10.0f && zEulerAngle <= 355.0f) && velocity <= 0.01f)
         {
             Vector3 extraHeight = RB.transform.position;
             extraHeight.y += 0.5f;
             RB.transform.position = extraHeight;
 
-            float r = RB.transform.rotation.eulerAngles.z;
-
-            RB.transform.Rotate(0, 0, 360 - r);
+            RB.transform.Rotate(0, 0, 360 - zEulerAngle);
         }
     }
     private void updateWheel(WheelCollider c, Transform t)
@@ -170,7 +198,7 @@ public class CarController : MonoBehaviour
         {
             effectAlreadyActive = true;
             activeEffect = 1;
-            maxSpeed += 20;
+            maxSpeed += 20.0f;
             Invoke("reverseEffect1", effectDuration);
         }
     }
