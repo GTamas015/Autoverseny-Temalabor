@@ -113,9 +113,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-
-  m_AnchoredPosition: {x: 0, y: 0.000002861}
-
+  m_AnchoredPosition: {x: 0, y: 0.0000047683943}
   m_SizeDelta: {x: 257, y: 257}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &22218860
@@ -216,7 +214,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 3.74
+  orthographic size: 3.26
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -325,9 +323,7 @@ MonoBehaviour:
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
   m_DynamicPixelsPerUnit: 1
-
   m_PresetInfoIsWorld: 0
-
 --- !u!114 &11464744
 MonoBehaviour:
   m_ObjectHideFlags: 0
