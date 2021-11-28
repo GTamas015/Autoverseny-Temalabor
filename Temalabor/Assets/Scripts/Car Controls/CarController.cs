@@ -5,7 +5,6 @@ public class CarController : MonoBehaviour
     private float horizontal;
     private float vertical;
     private bool isBraking;
-    private float currentBrakeForce;
 
     private float originalMaxSpeed;
     private WheelFrictionCurve originalfc;
@@ -25,7 +24,6 @@ public class CarController : MonoBehaviour
     [SerializeField] public float velocity;
     [SerializeField] public float maxSpeed;
 
-    [SerializeField] public int activeEffect;
     [SerializeField] public float effectDuration;
 
     [SerializeField] public WheelCollider FrontLeftCollider;
@@ -74,10 +72,7 @@ public class CarController : MonoBehaviour
 
         airDrag();
 
-        if (isBraking)
-        {
-            handleBraking();
-        }
+        handleBraking();
 
         flipCar();
 
@@ -102,15 +97,9 @@ public class CarController : MonoBehaviour
     {
         if (isBraking)
         {
-            currentBrakeForce = BrakeForce;
+            RearLeftCollider.brakeTorque += BrakeForce;
+            RearRightCollider.brakeTorque += BrakeForce;
         }
-        else
-        {
-            currentBrakeForce = 0.0f;
-        }
-
-        RearLeftCollider.brakeTorque += currentBrakeForce;
-        RearRightCollider.brakeTorque += currentBrakeForce;
     }
     private void steering()
     {
@@ -161,7 +150,6 @@ public class CarController : MonoBehaviour
         if (!CoinEffectActive)
         {
             CoinEffectActive = true;
-            activeEffect = 1;
             AirDragValue = originalAirDragValue / 2.0f;
             Invoke("reverseCoinEffect", effectDuration);
         }
@@ -170,7 +158,6 @@ public class CarController : MonoBehaviour
     private void reverseCoinEffect()
     {
         AirDragValue = originalAirDragValue;
-        activeEffect = 0;
         CoinEffectActive = false;
     }
 
@@ -179,7 +166,6 @@ public class CarController : MonoBehaviour
         if (!BananaEffectActive)
         {
             BananaEffectActive = true;
-            activeEffect = 2;
 
             WheelFrictionCurve fc = FrontLeftCollider.sidewaysFriction;
             fc.stiffness = 0.8f;
@@ -193,13 +179,11 @@ public class CarController : MonoBehaviour
     }
     private void reverseBananaEffect()
     {
-
         FrontLeftCollider.sidewaysFriction = originalfc;
         FrontRightCollider.sidewaysFriction = originalfc;
         RearLeftCollider.sidewaysFriction = originalfc;
         RearRightCollider.sidewaysFriction = originalfc;
 
-        activeEffect = 0;
         BananaEffectActive = false;
     }
 
