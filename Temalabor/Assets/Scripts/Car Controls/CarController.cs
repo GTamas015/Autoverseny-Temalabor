@@ -4,28 +4,26 @@ public class CarController : MonoBehaviour
 {
     private float horizontal;
     private float vertical;
-    private bool isBreaking;
-    private float currentBrakeForce;
-
-    private bool effectAlreadyActive;
+    private bool isBraking;
 
     private float originalMaxSpeed;
     private WheelFrictionCurve originalfc;
+    private float originalAirDragValue;
 
-    private bool effect1active;
-    private bool effect2active;
+    private bool CoinEffectActive;
+    private bool BananaEffectActive;
 
     [SerializeField] public float MotorForce;
     [SerializeField] public float BrakeForce;
     [SerializeField] public float maxSteeringAngle;
     [SerializeField] public float DecelerationForce;
+    [SerializeField] public float AirDragValue;
 
     [SerializeField] public Rigidbody RB;
 
     [SerializeField] public float velocity;
     [SerializeField] public float maxSpeed;
 
-    [SerializeField] public int activeEffect;
     [SerializeField] public float effectDuration;
 
     [SerializeField] public WheelCollider FrontLeftCollider;
@@ -50,9 +48,12 @@ public class CarController : MonoBehaviour
 
         RB.centerOfMass = com;
 
-        effectAlreadyActive = false;
+        CoinEffectActive = false;
+        BananaEffectActive = false;
+
         originalMaxSpeed = maxSpeed;
         originalfc = FrontLeftCollider.sidewaysFriction;
+        originalAirDragValue = AirDragValue;
     }
 
     // Update is called once per frame
@@ -67,91 +68,43 @@ public class CarController : MonoBehaviour
 
         steering();
 
-        if (!isBreaking)
-        {
-            decelerate();
-        }
-
         calculateVelocity();
+
+        airDrag();
+
+        handleBraking();
 
         flipCar();
 
         updateAllWheels();
-
-        if (effect1active)
-        {
-            effect1();
-        }
-
-        if (effect2active)
-        {
-            effect2();
-        }
     }
 
     private void getInput()
     {
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
-        isBreaking = Input.GetKey(KeyCode.Space);
-
-        effect1active = Input.GetKey(KeyCode.K);
-        effect2active = Input.GetKey(KeyCode.L);
+        isBraking = Input.GetKey(KeyCode.Space);
     }
 
     private void handleCar()
     {
-        if (RB.velocity.magnitude < maxSpeed)
-        {
-            FrontLeftCollider.motorTorque = vertical * MotorForce;
-            FrontRightCollider.motorTorque = vertical * MotorForce;
-            RearLeftCollider.motorTorque = vertical * MotorForce;
-            RearRightCollider.motorTorque = vertical * MotorForce;
-        }
-        else
-        {
-            FrontLeftCollider.motorTorque = 0.0f;
-            FrontRightCollider.motorTorque = 0.0f;
-            RearLeftCollider.motorTorque = 0.0f;
-            RearRightCollider.motorTorque = 0.0f;
-        }
+        FrontLeftCollider.motorTorque = vertical * MotorForce;
+        FrontRightCollider.motorTorque = vertical * MotorForce;
+        RearLeftCollider.motorTorque = vertical * MotorForce;
+        RearRightCollider.motorTorque = vertical * MotorForce;
     }
     private void handleBraking()
     {
-        if (isBreaking)
+        if (isBraking)
         {
-            currentBrakeForce = BrakeForce;
+            RearLeftCollider.brakeTorque += BrakeForce;
+            RearRightCollider.brakeTorque += BrakeForce;
         }
-        else
-        {
-            currentBrakeForce = 0.0f;
-        }
-
-        RearLeftCollider.brakeTorque = currentBrakeForce;
-        RearRightCollider.brakeTorque = currentBrakeForce;
     }
     private void steering()
     {
         FrontLeftCollider.steerAngle = maxSteeringAngle * horizontal;
         FrontRightCollider.steerAngle = maxSteeringAngle * horizontal;
-    }
-    private void decelerate()
-    {
-        if (vertical == 0.0f && RB.velocity.magnitude >= 15.0f)
-        {
-            FrontLeftCollider.brakeTorque = DecelerationForce;
-            FrontRightCollider.brakeTorque = DecelerationForce;
-            RearLeftCollider.brakeTorque = DecelerationForce;
-            RearRightCollider.brakeTorque = DecelerationForce;
-        }
-        else
-        {
-            FrontLeftCollider.brakeTorque = 0.0f;
-            FrontRightCollider.brakeTorque = 0.0f;
-            RearLeftCollider.brakeTorque = 0.0f;
-            RearRightCollider.brakeTorque = 0.0f;
-        }
-
     }
     private void calculateVelocity()
     {
@@ -192,31 +145,27 @@ public class CarController : MonoBehaviour
         updateWheel(RearLeftCollider, RearLeftTransform);
         updateWheel(RearRightCollider, RearRightTransform);
     }
-    private void effect1()
+    public void coinEffect()
     {
-        if (!effectAlreadyActive)
+        if (!CoinEffectActive)
         {
-            effectAlreadyActive = true;
-            activeEffect = 1;
-            maxSpeed += 20.0f;
-            Invoke("reverseEffect1", effectDuration);
+            CoinEffectActive = true;
+            AirDragValue = originalAirDragValue / 2.0f;
+            Invoke("reverseCoinEffect", effectDuration);
         }
     }
 
-    private void reverseEffect1()
+    private void reverseCoinEffect()
     {
-        effectAlreadyActive = false;
-        maxSpeed = originalMaxSpeed;
-        activeEffect = 0;
-        effect1active = false;
+        AirDragValue = originalAirDragValue;
+        CoinEffectActive = false;
     }
 
-    private void effect2()
+    public void bananaEffect()
     {
-        if (!effectAlreadyActive)
+        if (!BananaEffectActive)
         {
-            effectAlreadyActive = true;
-            activeEffect = 2;
+            BananaEffectActive = true;
 
             WheelFrictionCurve fc = FrontLeftCollider.sidewaysFriction;
             fc.stiffness = 0.8f;
@@ -225,19 +174,43 @@ public class CarController : MonoBehaviour
             RearLeftCollider.sidewaysFriction = fc;
             RearRightCollider.sidewaysFriction = fc;
 
-            Invoke("reverseEffect2", effectDuration);
+            Invoke("reverseBananaEffect", effectDuration);
         }
     }
-    private void reverseEffect2()
+    private void reverseBananaEffect()
     {
-        effectAlreadyActive = false;
-
         FrontLeftCollider.sidewaysFriction = originalfc;
         FrontRightCollider.sidewaysFriction = originalfc;
         RearLeftCollider.sidewaysFriction = originalfc;
         RearRightCollider.sidewaysFriction = originalfc;
 
-        activeEffect = 0;
-        effect2active = false;
+        BananaEffectActive = false;
+    }
+
+    private void airDrag()
+    {
+        float drag;
+
+        if (velocity > 15.0f)
+        {
+            drag = MotorForce * (velocity / maxSpeed) * AirDragValue;
+
+            if (drag < 0.1f)
+                drag = 0.0f;
+
+            FrontLeftCollider.brakeTorque = drag;
+            FrontRightCollider.brakeTorque = drag;
+            RearRightCollider.brakeTorque = drag;
+            RearLeftCollider.brakeTorque = drag;
+        }
+        else
+        {
+            drag = 0.0f * AirDragValue;
+
+            FrontLeftCollider.brakeTorque = drag;
+            FrontRightCollider.brakeTorque = drag;
+            RearRightCollider.brakeTorque = drag;
+            RearLeftCollider.brakeTorque = drag;
+        }
     }
 }
