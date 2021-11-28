@@ -7,22 +7,18 @@ public class CarController : MonoBehaviour
     private bool isBraking;
     private float currentBrakeForce;
 
-    private bool effectAlreadyActive;
-
     private float originalMaxSpeed;
     private WheelFrictionCurve originalfc;
     private float originalAirDragValue;
 
-    private bool effect1active;
-    private bool effect2active;
+    private bool CoinEffectActive;
+    private bool BananaEffectActive;
 
     [SerializeField] public float MotorForce;
     [SerializeField] public float BrakeForce;
     [SerializeField] public float maxSteeringAngle;
     [SerializeField] public float DecelerationForce;
     [SerializeField] public float AirDragValue;
-
-    [SerializeField] public float ad;               //Ez nem kell
 
     [SerializeField] public Rigidbody RB;
 
@@ -54,7 +50,9 @@ public class CarController : MonoBehaviour
 
         RB.centerOfMass = com;
 
-        effectAlreadyActive = false;
+        CoinEffectActive = false;
+        BananaEffectActive = false;
+
         originalMaxSpeed = maxSpeed;
         originalfc = FrontLeftCollider.sidewaysFriction;
         originalAirDragValue = AirDragValue;
@@ -84,16 +82,6 @@ public class CarController : MonoBehaviour
         flipCar();
 
         updateAllWheels();
-
-        if (effect1active)
-        {
-            effect1();
-        }
-
-        if (effect2active)
-        {
-            effect2();
-        }
     }
 
     private void getInput()
@@ -101,9 +89,6 @@ public class CarController : MonoBehaviour
         horizontal = Input.GetAxis("Horizontal");
         vertical = Input.GetAxis("Vertical");
         isBraking = Input.GetKey(KeyCode.Space);
-
-        effect1active = Input.GetKey(KeyCode.K);
-        effect2active = Input.GetKey(KeyCode.L);
     }
 
     private void handleCar()
@@ -171,30 +156,29 @@ public class CarController : MonoBehaviour
         updateWheel(RearLeftCollider, RearLeftTransform);
         updateWheel(RearRightCollider, RearRightTransform);
     }
-    private void effect1()
+    public void coinEffect()
     {
-        if (!effectAlreadyActive)
+        if (!CoinEffectActive)
         {
-            effectAlreadyActive = true;
+            CoinEffectActive = true;
             activeEffect = 1;
             AirDragValue = originalAirDragValue / 2.0f;
-            Invoke("reverseEffect1", effectDuration);
+            Invoke("reverseCoinEffect", effectDuration);
         }
     }
 
-    private void reverseEffect1()
+    private void reverseCoinEffect()
     {
-        effectAlreadyActive = false;
         AirDragValue = originalAirDragValue;
         activeEffect = 0;
-        effect1active = false;
+        CoinEffectActive = false;
     }
 
-    private void effect2()
+    public void bananaEffect()
     {
-        if (!effectAlreadyActive)
+        if (!BananaEffectActive)
         {
-            effectAlreadyActive = true;
+            BananaEffectActive = true;
             activeEffect = 2;
 
             WheelFrictionCurve fc = FrontLeftCollider.sidewaysFriction;
@@ -204,12 +188,11 @@ public class CarController : MonoBehaviour
             RearLeftCollider.sidewaysFriction = fc;
             RearRightCollider.sidewaysFriction = fc;
 
-            Invoke("reverseEffect2", effectDuration);
+            Invoke("reverseBananaEffect", effectDuration);
         }
     }
-    private void reverseEffect2()
+    private void reverseBananaEffect()
     {
-        effectAlreadyActive = false;
 
         FrontLeftCollider.sidewaysFriction = originalfc;
         FrontRightCollider.sidewaysFriction = originalfc;
@@ -217,31 +200,19 @@ public class CarController : MonoBehaviour
         RearRightCollider.sidewaysFriction = originalfc;
 
         activeEffect = 0;
-        effect2active = false;
-    }
-
-    public void ActivateEffect1() 
-    {
-        effect1active = true;
-    }
-
-    public void ActivateEffect2()
-    {
-        effect2active = true;
+        BananaEffectActive = false;
     }
 
     private void airDrag()
     {
         float drag;
 
-        if (velocity > 15)
+        if (velocity > 15.0f)
         {
             drag = MotorForce * (velocity / maxSpeed) * AirDragValue;
 
-            if (drag < 0.1)
-                drag = 0;
-
-            ad = drag;
+            if (drag < 0.1f)
+                drag = 0.0f;
 
             FrontLeftCollider.brakeTorque = drag;
             FrontRightCollider.brakeTorque = drag;
@@ -251,8 +222,6 @@ public class CarController : MonoBehaviour
         else
         {
             drag = 0.0f * AirDragValue;
-
-            ad = drag;
 
             FrontLeftCollider.brakeTorque = drag;
             FrontRightCollider.brakeTorque = drag;
