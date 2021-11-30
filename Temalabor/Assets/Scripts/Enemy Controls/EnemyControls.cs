@@ -18,6 +18,8 @@ public class EnemyControls : MonoBehaviour
     public WheelCollider wheelFL;
     public WheelCollider wheelFR;
 
+    public Vector3[] quad = new Vector3[2];
+
     void Start()
     {
         Transform[] pathTranforms = path.GetComponentsInChildren<Transform>();
@@ -64,16 +66,37 @@ public class EnemyControls : MonoBehaviour
         }
         else
         {
-            wheelFL.motorTorque = maxMotorTorque / (wheelFL.steerAngle*1 + 2f);
-            wheelFR.motorTorque = maxMotorTorque / (wheelFR.steerAngle*1 + 2f);
+            wheelFL.motorTorque = maxMotorTorque * (1 - wheelFL.steerAngle/100);
+            wheelFR.motorTorque = maxMotorTorque * (1 - wheelFR.steerAngle/100);
         }
 
     }
 
     private void ChechWaypointDistance()
     {
-        if (Vector3.Distance(transform.position, nodes[currentNode].position) < distanceRadius)
-        {
+        //if (Vector3.Distance(transform.position, nodes[currentNode].position) < distanceRadius)
+        //{
+        //    if (currentNode == nodes.Count - 1)
+        //    {
+        //        currentNode = 0;
+        //    }
+        //    else
+        //    {
+        //        currentNode++;
+        //    }
+        //}
+        quad[0] = new Vector3(nodes[currentNode].position.x - (nodes[currentNode].localScale.x / 2),
+            transform.position.y,
+            nodes[currentNode].position.z - (nodes[currentNode].localScale.y / 2));
+        quad[1] = new Vector3(nodes[currentNode].position.x + (nodes[currentNode].localScale.x / 2),
+            transform.position.y,
+            nodes[currentNode].position.z - (nodes[currentNode].localScale.y / 2));
+
+        //egyenes egyenlete (y2-y1)*(x-x1) = (x2-x1)*(y-y1)
+        float x21 = quad[1].x - quad[0].x;
+        float z21 = quad[1].z - quad[0].z;
+
+        if (minDistance(transform.position,quad[0],quad[1]) < distanceRadius ) {
             if (currentNode == nodes.Count - 1)
             {
                 currentNode = 0;
@@ -83,6 +106,15 @@ public class EnemyControls : MonoBehaviour
                 currentNode++;
             }
         }
+    }
+
+    private float minDistance(Vector3 A, Vector3 B, Vector3 C)
+    {
+        Vector3 d = (C - B) / (Vector3.Distance(C, B));
+        Vector3 v = A - B;
+        float t = Vector3.Dot(v, d);
+        Vector3 P = B + t * d;
+        return Vector3.Distance(P, A);
     }
 }
 
