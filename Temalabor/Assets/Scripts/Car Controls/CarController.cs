@@ -173,8 +173,9 @@ public class CarController : MonoBehaviour
             FrontRightCollider.sidewaysFriction = fc;
             RearLeftCollider.sidewaysFriction = fc;
             RearRightCollider.sidewaysFriction = fc;
-
+            Debug.Log("fc");
             Invoke("reverseBananaEffect", effectDuration);
+            Debug.Log("reverseover");
         }
     }
     private void reverseBananaEffect()
@@ -183,7 +184,7 @@ public class CarController : MonoBehaviour
         FrontRightCollider.sidewaysFriction = originalfc;
         RearLeftCollider.sidewaysFriction = originalfc;
         RearRightCollider.sidewaysFriction = originalfc;
-
+        Debug.Log("reverse");
         BananaEffectActive = false;
     }
 
