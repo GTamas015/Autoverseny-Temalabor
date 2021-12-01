@@ -25,6 +25,7 @@ public class Coin : MonoBehaviour
         if (other.tag == "Player")
         {
             ScoreText.score++;
+            other.GetComponent<CarController>().coinEffect();
             Destroy(gameObject);
         }
     }

@@ -9,9 +9,7 @@ public class BananaCollider : MonoBehaviour
     {
         if (other.tag == "Player")
         {
-            Debug.Log("start");
             other.GetComponent<CarController>().bananaEffect();
-            Debug.Log("end");
         }
     }
 
