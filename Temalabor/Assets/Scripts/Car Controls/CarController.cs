@@ -9,6 +9,7 @@ public class CarController : MonoBehaviour
     private float originalMaxSpeed;
     private WheelFrictionCurve originalfc;
     private float originalAirDragValue;
+    private float originalMotorForce;
 
     private bool CoinEffectActive;
     private bool BananaEffectActive;
@@ -54,6 +55,7 @@ public class CarController : MonoBehaviour
         originalMaxSpeed = maxSpeed;
         originalfc = FrontLeftCollider.sidewaysFriction;
         originalAirDragValue = AirDragValue;
+        originalMotorForce = MotorForce;
     }
 
     // Update is called once per frame
@@ -167,6 +169,12 @@ public class CarController : MonoBehaviour
         {
             BananaEffectActive = true;
 
+            MotorForce = originalMotorForce / 3.0f;
+
+            Vector3 originalVelocity = RB.velocity;
+            originalVelocity /= 1.5f;
+            RB.velocity = Vector3.Lerp(RB.velocity, originalVelocity, 1);
+
             WheelFrictionCurve fc = FrontLeftCollider.sidewaysFriction;
             fc.stiffness = 0.8f;
             FrontLeftCollider.sidewaysFriction = fc;
@@ -180,6 +188,8 @@ public class CarController : MonoBehaviour
     }
     private void reverseBananaEffect()
     {
+        MotorForce = originalMotorForce;
+
         FrontLeftCollider.sidewaysFriction = originalfc;
         FrontRightCollider.sidewaysFriction = originalfc;
         RearLeftCollider.sidewaysFriction = originalfc;
