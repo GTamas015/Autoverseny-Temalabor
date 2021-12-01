@@ -21,7 +21,8 @@ public class Coin : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if(other.tag == "Player")
+        
+        if (other.tag == "Player")
         {
             ScoreText.score++;
             Destroy(gameObject);

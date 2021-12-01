@@ -4,13 +4,14 @@ using UnityEngine;
 
 public class BananaCollider : MonoBehaviour
 {
-    private float speedChange = -100;
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.tag == "Player" || other.tag == "Enemy")
+        if (other.tag == "Player")
         {
-            other.GetComponent<CarController>().RB.velocity *= 10;
+            Debug.Log("start");
+            other.GetComponent<CarController>().bananaEffect();
+            Debug.Log("end");
         }
     }
 
