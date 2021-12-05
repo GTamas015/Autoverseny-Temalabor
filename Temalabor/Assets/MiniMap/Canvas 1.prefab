@@ -929,6 +929,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   car: {fileID: 0}
+  enemy1: {fileID: 0}
+  enemy2: {fileID: 0}
   countdownText: {fileID: 4173407998738729223}
   timer: {fileID: 8792648082548186520}
   countTime: 5
@@ -943,7 +945,6 @@ GameObject:
   - component: {fileID: 4700991775516440831}
   - component: {fileID: 1836714370362860180}
   - component: {fileID: 2664936659710042853}
-  - component: {fileID: 3886520152011453591}
   m_Layer: 5
   m_Name: RankText
   m_TagString: Untagged
@@ -1068,21 +1069,6 @@ MonoBehaviour:
   m_hasFontAssetChanged: 0
   m_baseMaterial: {fileID: 0}
   m_maskOffset: {x: 0, y: 0, z: 0, w: 0}
---- !u!114 &3886520152011453591
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7818906677768113736}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 19224cc714039ad48b6be288ee2a4619, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  rankText: {fileID: 2664936659710042853}
-  space: {fileID: 0}
-  rank: 1
 --- !u!1 &8805972960276654486
 GameObject:
   m_ObjectHideFlags: 0
@@ -1232,5 +1218,3 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   scoreText: {fileID: 3014408639449610962}
-  space: {fileID: 0}
-  score: 0
