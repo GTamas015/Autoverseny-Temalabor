@@ -21,15 +21,15 @@ public class GameOverMenu : MonoBehaviour
 
     public void setRank()
     {
-        rankText.text = "1";
+        rankText.text = RaceManager.rank;
     }
 
     public void setScore() {
-        scoreText.text = "1";
+        scoreText.text = ScoreText.score.ToString();
     }
 
     public void setTime() {
-        timeText.text = "1";
+        timeText.text = TimerText.timeText;
     }
 
     public void PlayGame()

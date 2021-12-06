@@ -2098,6 +2098,7 @@ MonoBehaviour:
   rankText: {fileID: 2098565897}
   scoreText: {fileID: 1591054351}
   timeText: {fileID: 1745990369}
+  raceManager: {fileID: 5915187972999483633, guid: 570a5e5e0ac020743a2dc9593fbaf6ff, type: 3}
 --- !u!1 &1745990367
 GameObject:
   m_ObjectHideFlags: 0

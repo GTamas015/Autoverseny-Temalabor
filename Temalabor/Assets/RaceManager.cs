@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -18,6 +19,7 @@ public class RaceManager : MonoBehaviour
     private int numberofCheckpoints;
 
     public TextMeshProUGUI rankText;
+    public static String rank;
 
     // Start is called before the first frame update
     void Start()
@@ -65,6 +67,7 @@ public class RaceManager : MonoBehaviour
         comparePositions(carNumber);
     }
 
+
     public void comparePositions(int carNumber)
     {
         if (cars[carNumber].GetComponent<CarCPManager>().carPosition > 1) 
@@ -95,7 +98,7 @@ public class RaceManager : MonoBehaviour
                 carInFront.GetComponent<CarCPManager>().carPosition = carInFrontPos + 1;
             }
             rankText.text = cars[0].GetComponent<CarCPManager>().carPosition.ToString();
-
+            rank = rankText.text;
         }
     }
 

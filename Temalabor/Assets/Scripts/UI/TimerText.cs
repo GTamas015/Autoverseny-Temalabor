@@ -19,6 +19,8 @@ public class TimerText : MonoBehaviour
     private float elapsedTime;
     private TimeSpan timePlaying;
 
+    public static String timeText;
+
     public void Update()
     {
         if (isActive)
@@ -32,6 +34,7 @@ public class TimerText : MonoBehaviour
         elapsedTime += Time.deltaTime;
         timePlaying = TimeSpan.FromSeconds(elapsedTime);
         TextTimer.text = timePlaying.ToString("mm':'ss'.'ff");
+        timeText = TextTimer.text;
         }
 
     public void StartTimer()
