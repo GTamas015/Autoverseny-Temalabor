@@ -8,20 +8,29 @@ public class EnemyControls : MonoBehaviour
     private List<Transform> nodes;
     private int currentNode = 0;
 
-    public float maxSteerAngle = 60f;  //45f
+    private float maxSteerAngle = 90f;  //45f
     public float maxMotorTorque = 80f;
     public float currentSpeed;
     public float maxSpeed = 100f;
 
-    public float distanceRadius = 5f;
+    private float distanceRadius = 5.0f;
 
     public WheelCollider wheelFL;
     public WheelCollider wheelFR;
+    public WheelCollider RearLeftCollider;
+    public WheelCollider RearRightCollider;
+    public float ero;
+    public float Seged1;
+    public float Seged2;
+    public float rising = 0;
+    public float slope = 0;
+    public float once = 0;
 
     public Vector3[] quad = new Vector3[2];
 
     void Start()
     {
+        ero = RearLeftCollider.motorTorque;
         Transform[] pathTranforms = path.GetComponentsInChildren<Transform>();
         nodes = new List<Transform>();
 
@@ -52,51 +61,45 @@ public class EnemyControls : MonoBehaviour
     private void Drive()
     {
         currentSpeed = 2 * Mathf.PI * wheelFL.radius * wheelFL.rpm * 60 / 1000;
+        Seged1 = transform.position.y;
+        Seged2 = nodes[currentNode].position.y;
+        ero = Mathf.Abs(wheelFL.steerAngle);
 
-        Vector2.Distance(new Vector2(transform.position.x, transform.position.z), new Vector2(nodes[currentNode].position.x, nodes[currentNode].position.z));
-        if (wheelFL.steerAngle == 0 || wheelFR.steerAngle == 0)
+        if (rising > 0)
+        {
+            wheelFL.motorTorque = maxMotorTorque * 3;
+            wheelFR.motorTorque = maxMotorTorque * 3;
+            RearLeftCollider.motorTorque = maxMotorTorque * 3;
+            RearRightCollider.motorTorque = maxMotorTorque * 3;
+        }
+        else if (slope > 0)
+        {
+            wheelFL.motorTorque = maxMotorTorque / 2;
+            wheelFR.motorTorque = maxMotorTorque / 2;
+            RearLeftCollider.motorTorque = maxMotorTorque / 5;
+            RearRightCollider.motorTorque = maxMotorTorque / 5;
+        }
+        else if (Mathf.Abs(wheelFL.steerAngle) < 30.0f || Mathf.Abs(wheelFR.steerAngle) < 30.0f)
         {
             wheelFL.motorTorque = maxMotorTorque;
             wheelFR.motorTorque = maxMotorTorque;
-        }
-        else if ((transform.position.y + 1.0f) < nodes[currentNode].position.y)
-        {
-            wheelFL.motorTorque = 3*maxMotorTorque;
-            wheelFR.motorTorque = 3*maxMotorTorque;
+            RearLeftCollider.motorTorque = 0;
+            RearRightCollider.motorTorque = 0;
         }
         else
         {
-            wheelFL.motorTorque = maxMotorTorque * (1 - wheelFL.steerAngle/100);
-            wheelFR.motorTorque = maxMotorTorque * (1 - wheelFR.steerAngle/100);
+            wheelFL.motorTorque = maxMotorTorque / 8;
+            wheelFR.motorTorque = maxMotorTorque / 8;
+            RearLeftCollider.motorTorque = 0;
+            RearRightCollider.motorTorque = 0;
         }
 
     }
 
     private void ChechWaypointDistance()
     {
-        //if (Vector3.Distance(transform.position, nodes[currentNode].position) < distanceRadius)
-        //{
-        //    if (currentNode == nodes.Count - 1)
-        //    {
-        //        currentNode = 0;
-        //    }
-        //    else
-        //    {
-        //        currentNode++;
-        //    }
-        //}
-        quad[0] = new Vector3(nodes[currentNode].position.x - (nodes[currentNode].localScale.x / 2),
-            transform.position.y,
-            nodes[currentNode].position.z - (nodes[currentNode].localScale.y / 2));
-        quad[1] = new Vector3(nodes[currentNode].position.x + (nodes[currentNode].localScale.x / 2),
-            transform.position.y,
-            nodes[currentNode].position.z - (nodes[currentNode].localScale.y / 2));
-
-        //egyenes egyenlete (y2-y1)*(x-x1) = (x2-x1)*(y-y1)
-        float x21 = quad[1].x - quad[0].x;
-        float z21 = quad[1].z - quad[0].z;
-
-        if (minDistance(transform.position,quad[0],quad[1]) < distanceRadius ) {
+        if (Vector3.Distance(transform.position, nodes[currentNode].position) < distanceRadius)
+        {
             if (currentNode == nodes.Count - 1)
             {
                 currentNode = 0;
@@ -104,17 +107,39 @@ public class EnemyControls : MonoBehaviour
             else
             {
                 currentNode++;
+
+                // emelkedo beallitasa
+                if (rising == 0)
+                {
+                    if (nodes[currentNode+1].position.y > transform.position.y)
+                    {
+                        rising = 3;
+                    }
+                }
+                if (rising > 0)
+                {
+                    rising--;
+                }
+
+                // leejto beallitasa
+                if (once == 0)
+                {
+                    if (slope == 0)
+                    {
+                        if (nodes[currentNode + 1].position.y + 3.0f < transform.position.y)
+                        {
+                            slope = 2;
+                            once = 1;
+                        }
+                    }
+                }
+                if (slope > 0)
+                {
+                    slope--;
+                }
             }
         }
     }
 
-    private float minDistance(Vector3 A, Vector3 B, Vector3 C)
-    {
-        Vector3 d = (C - B) / (Vector3.Distance(C, B));
-        Vector3 v = A - B;
-        float t = Vector3.Dot(v, d);
-        Vector3 P = B + t * d;
-        return Vector3.Distance(P, A);
-    }
 }
 
