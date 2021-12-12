@@ -90,8 +90,8 @@ public class EnemyControls : MonoBehaviour
         {
             wheelFL.motorTorque = maxMotorTorque / 8;
             wheelFR.motorTorque = maxMotorTorque / 8;
-            RearLeftCollider.motorTorque = 0;
-            RearRightCollider.motorTorque = 0;
+            RearLeftCollider.motorTorque = maxMotorTorque / 8;
+            RearRightCollider.motorTorque = maxMotorTorque / 8;
         }
 
     }
