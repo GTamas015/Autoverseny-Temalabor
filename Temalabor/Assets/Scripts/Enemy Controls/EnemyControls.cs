@@ -9,7 +9,7 @@ public class EnemyControls : MonoBehaviour
     private int currentNode = 0;
 
     private float maxSteerAngle = 90f;  //45f
-    public float maxMotorTorque = 80f;
+    private float maxMotorTorque = 600f;
     public float currentSpeed;
     public float maxSpeed = 100f;
 
@@ -74,15 +74,15 @@ public class EnemyControls : MonoBehaviour
         }
         else if (slope > 0)
         {
-            wheelFL.motorTorque = maxMotorTorque / 2;
-            wheelFR.motorTorque = maxMotorTorque / 2;
-            RearLeftCollider.motorTorque = maxMotorTorque / 5;
-            RearRightCollider.motorTorque = maxMotorTorque / 5;
+            wheelFL.motorTorque = maxMotorTorque / 5;
+            wheelFR.motorTorque = maxMotorTorque / 5;
+            RearLeftCollider.motorTorque = maxMotorTorque / 3;
+            RearRightCollider.motorTorque = maxMotorTorque / 3;
         }
         else if (Mathf.Abs(wheelFL.steerAngle) < 30.0f || Mathf.Abs(wheelFR.steerAngle) < 30.0f)
         {
-            wheelFL.motorTorque = maxMotorTorque;
-            wheelFR.motorTorque = maxMotorTorque;
+            wheelFL.motorTorque = maxMotorTorque * 2;
+            wheelFR.motorTorque = maxMotorTorque * 2;
             RearLeftCollider.motorTorque = 0;
             RearRightCollider.motorTorque = 0;
         }
