@@ -21,8 +21,11 @@ public class Coin : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        
-        if (other.tag == "Player")
+        if (other.tag == "enemy") 
+        {
+            Destroy(gameObject);
+        }
+        else if (other.tag == "Player")
         {
             ScoreText.score++;
             other.GetComponent<CarController>().coinEffect();
